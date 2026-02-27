@@ -529,6 +529,9 @@ int main(int argc, char* const* argv) {
         case 0x03:
           json_object_push(j, "UHS speed grade", json_string_new("30MB/s and higher"));
           break;
+        default:
+          json_object_push(j, "UHS speed grade", json_sprintf_new("Unknown: 0x%x", data_in[19]));
+          break;
         }
         json_object_push(j, "Total spare blocks cnt", json_integer_new((int)(data_in[24])));
         json_object_push(j, "Factory bad blocks cnt", json_integer_new((int)(data_in[25])));
@@ -539,7 +542,9 @@ int main(int argc, char* const* argv) {
         json_object_push(j, "Maximum erase cnt", json_integer_new(nwordbe_to_int(data_in, 36, 4)));
         json_object_push(j, "Total erase cnt", json_integer_new(nwordbe_to_int(data_in, 40, 4)));
         json_object_push(j, "Average erase cnt", json_integer_new(nwordbe_to_int(data_in, 44, 4)));
-        json_object_push(j, "FW version", json_sprintf_new("%c%c%c%c%c%c%c", data_in[53], data_in[54], data_in[55], data_in[56], data_in[57], data_in[58], data_in[59]));
+        strncpy(tmpstr, (char *)&data_in[53], 16);
+        tmpstr[16] = 0;
+        json_object_push(j, "FW version", json_string_new(tmpstr));
         close(fd);
         json_object_push(j, "success", json_boolean_new(1));
         json_print_and_free(j);
